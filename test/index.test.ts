@@ -43,7 +43,7 @@ describe("js", () => {
 
   it("error in", () => {
     expect(() => new TextJs("{{null.hello}}").render()).toThrowError(
-      /Internal error in 'return null\.hello;'\: .+/
+      /Internal error in 'return null\.hello;': .+/
     );
   });
 

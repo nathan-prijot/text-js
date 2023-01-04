@@ -13,7 +13,7 @@ Text Js support the following statements:
 ## Install
 
 ```
-npm install text-js
+npm install text-js-render
 ```
 
 ## Usage
