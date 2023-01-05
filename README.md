@@ -19,19 +19,22 @@ npm install text-js-render
 ## Usage
 
 ```ts
-import { TextJs } from "text-js";
+import { TextJs } from "text-js-render";
 
 // Specify a context
 const context = {
-    articles: [
-        title: "Test Js is amazing !",
-        description: "Why rendering templates using Function is amazing and more.",
-        author: {
-            name: "Nathan Prijot",
-            email: "nathanprijot@live.be"
-        },
-        date: "01-04-23"
-    ]
+  articles: [
+    {
+      title: "Test Js is amazing !",
+      description:
+        "Why rendering templates using Function is amazing and more.",
+      author: {
+        name: "Nathan Prijot",
+        email: "nathanprijot@live.be",
+      },
+      date: "01-04-23",
+    },
+  ],
 };
 
 // Specify a template
@@ -43,7 +46,7 @@ const template = `
         <p>
             {% if article.author %}
                 {{ article.author.name }}
-                {{ article.author.email ? "(" + article.author.email + ")" : "" }}
+                {{ article.author.email ? " (" + article.author.email + ")" : "" }}
             {% endif %}
             {% if article.date %}
                 {{ new Date(article.date).toLocaleDateString() }}
@@ -55,41 +58,82 @@ const template = `
 
 // Render your context with the template
 const result = new TextJs(template).render(context);
+// Will returns (line returns and spaces trimmed)
+// <h3>Test Js is amazing !</h3>
+// <p>Why rendering templates using Function is amazing and more.</p>
+// <p>Nathan Prijot(nathanprijot@live.be)<span>04/01/2023</span></p>
 ```
 
 ## Statements
 
 ### If with else if and else
 
-```
-{% if foo %}
-    Foo content
-{% elseif bar %}
-    Bar content
-{% else %}
-    Else content
-{% endif %}
+Typical conditioning. The format is the following: `if {JavaScript}` and `elseif {JavaScript}`.
+
+```ts
+new TextJs(`
+    {% if foobar === "foo" %}
+      Foo
+    {% elseif foobar === "bar" %}
+      Bar
+    {% else %}
+      Else
+    {% endif %}
+  `)
+  .render({ foobar: "foo" })
+  .trim(); // Trimmed to remove spaces and line returns
+// Will return "Foo"
 ```
 
 ### Foreach
 
-```
-{% foreach item, index in array %}
-    {{index + 1}}. {{ item }}
-{% endforeach %}
+Typical iteration of all the items in the given array. The format is the following: `foreach {itemName}[, {indexName}] in {JavaScript}`. You can put any valid JavaScript that results into an array after the `in`. The `indexName` is optional. By default the name of the current index will be `index`.
+
+```ts
+new TextJs(`
+    {% foreach item, index in array %}
+      {{index + 1}}. {{ item }}
+    {% endforeach %}
+  `)
+  .render({ array: ["foo", "bar"] })
+  .replace(/\s{2,}|\n/gm, ""); // Trimmed to remove spaces and line returns
+// Will return "1. foo2. bar"
 ```
 
 ### Switch
 
+Typical switch that allow dynamic case values. The format is the following: `switch {JavaScript}` and `case {JavaScript}`.
+
+```ts
+new TextJs(`
+    {% switch foobar %}
+      {% case "foo" %}
+        Foo
+      {% case "bar" %}
+        Bar
+      {% default %}
+        Default
+    {% endswitch %}
+  `)
+  .render({ foobar: "foo" })
+  .trim(); // Trimmed to remove spaces and line returns
+// Will return "Foo"
 ```
-{% switch foobar %}
-    {% case "bar" %}
-        Foo content
-    {% case "foo" %}
-        Bar content
-    {% default %}
-        Default content
-{% endswitch %}
+
+Dynamic example:
+
+```ts
+new TextJs(`
+    {% switch foobar %}
+      {% case fooCase %}
+        Foo
+      {% case barCase %}
+        Bar
+    {% endswitch %}
+  `)
+  .render({ foobar: "bar", fooCase: "foo", barCase: "bar" })
+  .trim(); // Trimmed to remove spaces and line returns
+// Will return "Bar"
 ```
 
 ### Options

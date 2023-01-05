@@ -406,3 +406,109 @@ describe("options", () => {
     ).toBe("Hi !Hello !Hello !");
   });
 });
+
+describe("examples", () => {
+  it("home", () => {
+    // Specify a context
+    const context = {
+      articles: [
+        {
+          title: "Test Js is amazing !",
+          description:
+            "Why rendering templates using Function is amazing and more.",
+          author: {
+            name: "Nathan Prijot",
+            email: "nathanprijot@live.be",
+          },
+          date: "01-04-23",
+        },
+      ],
+    };
+
+    // Specify a template
+    const template = `
+{% foreach article in articles %}
+    <h3>{{ article.title }}</h3>
+    <p>{{ article.description }}</p>
+    {% if article.author || article.date %}
+        <p>
+            {% if article.author %}
+                {{ article.author.name }}
+                {{ article.author.email ? "(" + article.author.email + ")" : "" }}
+            {% endif %}
+            {% if article.date %}
+                <span>{{ new Date(article.date).toLocaleDateString() }}</span>
+            {% endif %}
+         </p>
+    {% endif %}
+{% endforeach %}
+`;
+
+    // Render your context with the template
+    const result = new TextJs(template).render(context);
+
+    expect(result.replace(/\s{2,}|\n/gm, "")).toBe(
+      "<h3>Test Js is amazing !</h3><p>Why rendering templates using Function is amazing and more.</p><p>Nathan Prijot(nathanprijot@live.be)<span>04/01/2023</span></p>"
+    );
+  });
+
+  it("if", () => {
+    expect(
+      new TextJs(`
+      {% if foobar === "foo" %}
+        Foo
+      {% elseif foobar === "bar" %}
+        Bar
+      {% else %}
+        Else
+      {% endif %}
+  `)
+        .render({ foobar: "foo" })
+        .trim()
+    ).toBe("Foo");
+  });
+
+  it("foreach", () => {
+    expect(
+      new TextJs(`
+      {% foreach item, index in array %}
+        {{index + 1}}. {{ item }}
+      {% endforeach %}
+  `)
+        .render({ array: ["foo", "bar"] })
+        .replace(/\s{2,}|\n/gm, "")
+    ).toBe("1. foo2. bar");
+  });
+
+  it("switch", () => {
+    expect(
+      new TextJs(`
+      {% switch foobar %}
+        {% case "foo" %}
+          Foo
+        {% case "bar" %}
+          Bar
+        {% default %}
+          Default
+      {% endswitch %}
+  `)
+        .render({ foobar: "foo" })
+        .trim()
+    ).toBe("Foo");
+  });
+
+  it("dynamic switch", () => {
+    expect(
+      new TextJs(`
+  {% switch foobar %}
+    {% case fooCase %}
+      Foo
+    {% case barCase %}
+      Bar
+  {% endswitch %}
+  `)
+        .render({ foobar: "bar", fooCase: "foo", barCase: "bar" })
+        .trim()
+    ).toBe("Bar");
+  });
+});
