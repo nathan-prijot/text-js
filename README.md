@@ -12,7 +12,7 @@ Text Js support the following statements:
 
 ## Install
 
-```
+```console
 npm install text-js-render
 ```
 
@@ -30,7 +30,7 @@ const context = {
         "Why rendering templates using Function is amazing and more.",
       author: {
         name: "Nathan Prijot",
-        email: "nathanprijot@live.be",
+        email: "nathanprijot@ipnosite.be",
       },
       date: "01-04-23",
     },

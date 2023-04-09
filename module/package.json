@@ -7,22 +7,6 @@
     "module/"
   ],
   "type": "module",
-  "main": "./lib/index.js",
-  "types": "./lib/index.d.ts",
-  "module": "./module/index.js",
-  "exports": {
-    ".": {
-      "import": {
-        "types": "./module/index.d.ts",
-        "default": "./module/index.js"
-      },
-      "require": {
-        "types": "./lib/index.d.ts",
-        "default": "./lib/index.js"
-      },
-      "default": "./lib/index.js"
-    }
-  },
   "scripts": {
     "test": "jest --coverage",
     "lint": "eslint ./src",
