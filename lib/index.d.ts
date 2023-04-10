@@ -76,10 +76,12 @@ export interface IDelimiters {
 }
 /** Options for a new TextJs instance. */
 export interface ITextJsOptions {
-    /** Customize the keys of the delimiters. */
+    /** Customizes the keys of the delimiters. */
     delimiters?: Partial<IDelimiters>;
-    /** Customize the keys of the statements. */
+    /** Customizes the keys of the statements. */
     statements?: Partial<IStatements>;
+    /** If true, removes all lines returns and lines white-spaces from the render result. */
+    trimResult?: boolean;
 }
 /** A TextJs instance. */
 export declare class TextJs {
@@ -91,6 +93,8 @@ export declare class TextJs {
     private _context;
     /** The result of the template processing. */
     private _nodes;
+    /** The value of the trim result option. */
+    private _trimResult;
     /**
      * Creates a new TextJs instance.
      * @param template - The template to process. Shortcut of {@link template}.

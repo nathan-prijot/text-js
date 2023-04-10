@@ -1,6 +1,6 @@
 {
   "name": "text-js-render",
-  "version": "1.0.0-alpha.2",
+  "version": "1.0.0-beta.0",
   "description": "Template rendering with JavaScript flavour.",
   "files": [
     "lib/",
@@ -10,7 +10,7 @@
   "scripts": {
     "test": "jest --coverage",
     "lint": "eslint ./src",
-    "build": "tsc -p ./tsconfig.esm.json && tsc -p ./tsconfig.commonjs.json && tsconfig-to-dual-package",
+    "build": "tsc -p ./tsconfig.json && tsc -p ./tsconfig.commonjs.json && tsconfig-to-dual-package",
     "clean": "git clean -fx lib/ module/",
     "prepublish": "npm run clean && npm run build"
   },
@@ -24,7 +24,7 @@
     "name": "Nathan Prijot",
     "email": "nathanprijot@live.be"
   },
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
     "@types/jest": "^29.2.4",
     "@typescript-eslint/eslint-plugin": "^5.48.0",

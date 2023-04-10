@@ -409,6 +409,7 @@ export class TextJs {
             default: ((_o = options === null || options === void 0 ? void 0 : options.statements) === null || _o === void 0 ? void 0 : _o.default) || "default",
             endSwitch: ((_p = options === null || options === void 0 ? void 0 : options.statements) === null || _p === void 0 ? void 0 : _p.endSwitch) || "endswitch",
         };
+        this._trimResult = (options === null || options === void 0 ? void 0 : options.trimResult) || false;
         if (template)
             this.template(template);
     }
@@ -418,6 +419,8 @@ export class TextJs {
      * @returns The TextJs instance.
      */
     template(template) {
+        if (this._trimResult)
+            template = template.replace(/^\s+|\s+$|$\n/gm, "");
         const steps = [];
         let startIndex = 0, endIndex = 0, lookingFor = null, value;
         while (startIndex < template.length || endIndex < template.length - 1) {

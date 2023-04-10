@@ -405,6 +405,32 @@ describe("options", () => {
       })
     ).toBe("Hi !Hello !Hello !");
   });
+
+  const trimResult = `
+    {{text}}   {{text}}
+  `;
+
+  it("trim result on", () => {
+    expect(
+      new TextJs(trimResult, { trimResult: true }).render({
+        text: "Hello",
+      })
+    ).toBe("Hello   Hello");
+  });
+
+  it("trim result off", () => {
+    expect(
+      new TextJs(trimResult).render({
+        text: "Hello",
+      })
+    ).toBe("\n    Hello   Hello\n  ");
+  });
+
+  const trimLineReturn = `Text{{"\\n"}}Text`;
+
+  it("trim result on with line return", () => {
+    expect(new TextJs(trimLineReturn).render()).toBe("Text\nText");
+  });
 });
 
 describe("examples", () => {
@@ -413,12 +439,12 @@ describe("examples", () => {
     const context = {
       articles: [
         {
-          title: "Test Js is amazing !",
+          title: "Text Js is amazing !",
           description:
             "Why rendering templates using Function is amazing and more.",
           author: {
             name: "Nathan Prijot",
-            email: "nathanprijot@live.be",
+            email: "nathanprijot@ipnosite.be",
           },
           date: "01-04-23",
         },
@@ -445,10 +471,10 @@ describe("examples", () => {
 `;
 
     // Render your context with the template
-    const result = new TextJs(template).render(context);
+    const result = new TextJs(template, { trimResult: true }).render(context);
 
-    expect(result.replace(/\s{2,}|\n/gm, "")).toBe(
-      "<h3>Test Js is amazing !</h3><p>Why rendering templates using Function is amazing and more.</p><p>Nathan Prijot(nathanprijot@live.be)<span>04/01/2023</span></p>"
+    expect(result).toBe(
+      "<h3>Text Js is amazing !</h3><p>Why rendering templates using Function is amazing and more.</p><p>Nathan Prijot(nathanprijot@ipnosite.be)<span>04/01/2023</span></p>"
     );
   });
 
@@ -470,19 +496,21 @@ describe("examples", () => {
 
   it("foreach", () => {
     expect(
-      new TextJs(`
+      new TextJs(
+        `
       {% foreach item, index in array %}
         {{index + 1}}. {{ item }}
       {% endforeach %}
-  `)
-        .render({ array: ["foo", "bar"] })
-        .replace(/\s{2,}|\n/gm, "")
+  `,
+        { trimResult: true }
+      ).render({ array: ["foo", "bar"] })
     ).toBe("1. foo2. bar");
   });
 
   it("switch", () => {
     expect(
-      new TextJs(`
+      new TextJs(
+        `
       {% switch foobar %}
         {% case "foo" %}
           Foo
@@ -491,24 +519,25 @@ describe("examples", () => {
         {% default %}
           Default
       {% endswitch %}
-  `)
-        .render({ foobar: "foo" })
-        .trim()
+  `,
+        { trimResult: true }
+      ).render({ foobar: "foo" })
     ).toBe("Foo");
   });
 
   it("dynamic switch", () => {
     expect(
-      new TextJs(`
+      new TextJs(
+        `
   {% switch foobar %}
     {% case fooCase %}
       Foo
     {% case barCase %}
       Bar
   {% endswitch %}
-  `)
-        .render({ foobar: "bar", fooCase: "foo", barCase: "bar" })
-        .trim()
+  `,
+        { trimResult: true }
+      ).render({ foobar: "bar", fooCase: "foo", barCase: "bar" })
     ).toBe("Bar");
   });
 });

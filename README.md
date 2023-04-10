@@ -1,22 +1,53 @@
 # Text Js
 
-Text Js is a weird template language allowing you to put JavaScript code inside any kind of text. Generating HTML, XML, CSV or even JSON (as useless as it my sound) becomes an easy task.
+![license-badge](https://img.shields.io/npm/l/text-js-render)
+![coverage-badge](https://img.shields.io/badge/coverage-100%25-brightgreen)
+![version-badge](https://img.shields.io/npm/v/text-js-render)
+![downloads-badge](https://img.shields.io/npm/dt/text-js-render)
 
-## Features
+Text Js is a weird template language allowing you to put JavaScript code inside any kind of text template. Generating HTML, XML, CSV or even JSON (as useless as it my sound) becomes an easy task with Text Js !
 
-Text Js support the following statements:
+## Installation
 
-- If with else if and else
-- For each
-- Switch with case and default
-
-## Install
-
-```console
+```bash
 npm install text-js-render
 ```
 
 ## Usage
+
+As a node module:
+
+```js
+const { TextJs } = require("text-js-render");
+
+const template = "<h1>{{text}}</h1>";
+const context = { text: "My text" };
+const result = new TextJs(template).render(context);
+```
+
+As an esm module:
+
+```js
+import { TextJs } from "text-js-render";
+
+const template = "<h1>{{text}}</h1>";
+const context = { text: "My text" };
+const result = new TextJs(template).render(context);
+```
+
+In the browser:
+
+```js
+const { TextJs } = await import(
+  "https://unpkg.com/text-js-render@1.0.0-beta.0/lib/index.js?module"
+);
+
+const template = "<h1>{{text}}</h1>";
+const context = { text: "My text" };
+const result = new TextJs(template).render(context);
+```
+
+### Basic example
 
 ```ts
 import { TextJs } from "text-js-render";
@@ -25,7 +56,7 @@ import { TextJs } from "text-js-render";
 const context = {
   articles: [
     {
-      title: "Test Js is amazing !",
+      title: "Text Js is amazing !",
       description:
         "Why rendering templates using Function is amazing and more.",
       author: {
@@ -57,18 +88,22 @@ const template = `
 `;
 
 // Render your context with the template
-const result = new TextJs(template).render(context);
-// Will returns (line returns and spaces trimmed)
-// <h3>Test Js is amazing !</h3>
-// <p>Why rendering templates using Function is amazing and more.</p>
-// <p>Nathan Prijot(nathanprijot@live.be)<span>04/01/2023</span></p>
+// The result is trimmed since we are making HTML
+const result = new TextJs(template, { trimResult: true }).render(context);
+// Will returns "<h3>Text Js is amazing !</h3><p>Why rendering templates using Function is amazing and more.</p><p>Nathan Prijot(nathanprijot@ipnosite.be)<span>04/01/2023</span></p>"
 ```
 
-## Statements
+### Available statements
 
-### If with else if and else
+List of available statements:
 
-Typical conditioning. The format is the following: `if {JavaScript}` and `elseif {JavaScript}`.
+- [if, elseif, else, endif](#if-elseif-else-endif)
+- [foreach, endforeach](#foreach-endforeach)
+- [switch, case, default, endswitch](#switch-case-default-endswitch)
+
+#### if, elseif, else, endif
+
+Allows conditioning. The format is the following: `if {JavaScript}` and `elseif {JavaScript}`.
 
 ```ts
 new TextJs(`
@@ -79,30 +114,28 @@ new TextJs(`
     {% else %}
       Else
     {% endif %}
-  `)
-  .render({ foobar: "foo" })
-  .trim(); // Trimmed to remove spaces and line returns
-// Will return "Foo"
+  `).render({ foobar: "foo" }, { trimResult: true });
+// Will returns "Foo"
 ```
 
-### Foreach
+#### foreach, endforeach
 
-Typical iteration of all the items in the given array. The format is the following: `foreach {itemName}[, {indexName}] in {JavaScript}`. You can put any valid JavaScript that results into an array after the `in`. The `indexName` is optional. By default the name of the current index will be `index`.
+Allows the iteration of all the items in an array. The format is the following: `foreach {itemName}[, {indexName}] in {JavaScript}`. You can put any valid JavaScript that returns an array after the `in`. The `indexName` is optional. By default the name of the current index will be `index`.
 
 ```ts
 new TextJs(`
     {% foreach item, index in array %}
       {{index + 1}}. {{ item }}
     {% endforeach %}
-  `)
-  .render({ array: ["foo", "bar"] })
-  .replace(/\s{2,}|\n/gm, ""); // Trimmed to remove spaces and line returns
-// Will return "1. foo2. bar"
+  `).render({ array: ["foo", "bar"] }, { trimResult: true });
+// Will returns "1. foo2. bar"
 ```
 
-### Switch
+#### switch, case, default, endswitch
 
-Typical switch that allow dynamic case values. The format is the following: `switch {JavaScript}` and `case {JavaScript}`.
+Allows to switch on a property. The case value allows dynamic values. The format is the following: `switch {JavaScript}` and `case {JavaScript}`.
+
+Static cases values example:
 
 ```ts
 new TextJs(`
@@ -114,13 +147,11 @@ new TextJs(`
       {% default %}
         Default
     {% endswitch %}
-  `)
-  .render({ foobar: "foo" })
-  .trim(); // Trimmed to remove spaces and line returns
-// Will return "Foo"
+  `).render({ foobar: "foo" }, { trimResult: true });
+// Will returns "Foo"
 ```
 
-Dynamic example:
+Dynamic cases values example:
 
 ```ts
 new TextJs(`
@@ -130,13 +161,39 @@ new TextJs(`
       {% case barCase %}
         Bar
     {% endswitch %}
-  `)
-  .render({ foobar: "bar", fooCase: "foo", barCase: "bar" })
-  .trim(); // Trimmed to remove spaces and line returns
-// Will return "Bar"
+  `).render(
+  { foobar: "bar", fooCase: "foo", barCase: "bar" },
+  { trimResult: true }
+);
+// Will returns "Bar"
 ```
 
-### Options
+### Option
+
+#### Trim result
+
+By default, Text Js will not remove any of the white-spaces from the template. The `trimResult` option wil remove all the lines returns and all the white-spaces at the start and end of each line:
+
+```ts
+new TextJs(
+  `
+    {{text}}   {{text}}
+  `,
+  { trimResult: true }
+).render({
+  text: "Hello",
+});
+// Will returns "Hello   hello"
+```
+
+If you still need lines returns or white-spaces, you can insert them with a JavaScript snippet:
+
+```ts
+new TextJs(`Text{{"\\n"}}Text`).render();
+// Will returns "Text\nText" (where "\n" is an actual line return in the string)
+```
+
+#### Custom delimiters
 
 By default, Text Js uses `{%` and `%}` for statements. It also uses `{{` and `}}` for inline JavaScript. This can be easily changed via the options provided by the constructor:
 
@@ -156,8 +213,10 @@ const customDelimitersTemplate =
 new TextJs(customDelimitersTemplate, customDelimitersOptions).render({
   array: ["He", "ll", "o !"],
 });
-// Will return "Hello !"
+// Will returns "Hello !"
 ```
+
+#### Custom keywords
 
 You can also change the keyword used for each statement:
 
@@ -186,5 +245,9 @@ new TextJs(customStatementsTemplate, customStatementsOptions).render({
   array: ["Hel", "lo !"],
   hello: 1,
 });
-// Will output "Hi !Hello !Hello !"
+// Will returns "Hi !Hello !Hello !"
 ```
+
+## License
+
+[MIT](https://choosealicense.com/licenses/mit/)

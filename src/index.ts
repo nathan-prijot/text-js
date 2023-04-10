@@ -78,10 +78,12 @@ export interface IDelimiters {
 
 /** Options for a new TextJs instance. */
 export interface ITextJsOptions {
-  /** Customize the keys of the delimiters. */
+  /** Customizes the keys of the delimiters. */
   delimiters?: Partial<IDelimiters>;
-  /** Customize the keys of the statements. */
+  /** Customizes the keys of the statements. */
   statements?: Partial<IStatements>;
+  /** If true, removes all lines returns and lines white-spaces from the render result. */
+  trimResult?: boolean;
 }
 
 /** Parsed delimited content. */
@@ -551,6 +553,8 @@ export class TextJs {
   private _context: object = {};
   /** The result of the template processing. */
   private _nodes: Nodes | null = null;
+  /** The value of the trim result option. */
+  private _trimResult: boolean;
 
   /**
    * Creates a new TextJs instance.
@@ -577,6 +581,7 @@ export class TextJs {
       default: options?.statements?.default || "default",
       endSwitch: options?.statements?.endSwitch || "endswitch",
     };
+    this._trimResult = options?.trimResult || false;
     if (template) this.template(template);
   }
 
@@ -586,6 +591,8 @@ export class TextJs {
    * @returns The TextJs instance.
    */
   public template(template: string): TextJs {
+    if (this._trimResult) template = template.replace(/^\s+|\s+$|$\n/gm, "");
+
     const steps: IStep[] = [];
 
     let startIndex = 0,
