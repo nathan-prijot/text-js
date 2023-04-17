@@ -39,7 +39,7 @@ In the browser:
 
 ```js
 const { TextJs } = await import(
-  "https://unpkg.com/text-js-render@1.0.0-rc.0/module/index.js?module"
+  "https://unpkg.com/text-js-render@^1.0.0/module/index.js?module"
 );
 
 const template = "<h1>{{text}}</h1>";
@@ -47,7 +47,7 @@ const context = { text: "My text" };
 const result = new TextJs(template).render(context);
 ```
 
-**Remark**: for browser, a minified version is also available at [https://unpkg.com/text-js-render@1.0.0-rc.0/module/index.min.js?module](https://unpkg.com/text-js-render@1.0.0-rc.0/module/index.min.js?module)
+**Remark**: for browser, a minified version is also available at [https://unpkg.com/text-js-render@^1.0.0/module/index.min.js?module](https://unpkg.com/text-js-render@^1.0.0/module/index.min.js?module)
 
 ### Basic example
 
