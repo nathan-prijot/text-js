@@ -1,6 +1,6 @@
 {
   "name": "text-js-render",
-  "version": "1.0.0-beta.0",
+  "version": "1.0.0-rc.0",
   "description": "Template rendering with JavaScript flavour.",
   "files": [
     "lib/",
@@ -26,9 +26,10 @@
   "scripts": {
     "test": "jest --coverage",
     "lint": "eslint ./src",
-    "build": "tsc -p ./tsconfig.json && tsc -p ./tsconfig.commonjs.json && tsconfig-to-dual-package",
+    "build": "tsc -p ./tsconfig.json && tsc -p ./tsconfig.commonjs.json && tsconfig-to-dual-package && npm run minify",
     "clean": "git clean -fx lib/ module/",
-    "prepublish": "npm run clean && npm run build"
+    "prepublish": "npm run clean && npm run build",
+    "minify": "terser ./module/index.js --source-map \"content='./module/index.js.map'\" --compress --mangle --output ./module/index.min.js --mangle-props regex=/^_/"
   },
   "keywords": [
     "template",
@@ -46,6 +47,7 @@
     "@typescript-eslint/eslint-plugin": "^5.48.0",
     "eslint": "^8.31.0",
     "jest": "^29.3.1",
+    "terser": "^5.16.9",
     "ts-jest": "^29.0.3",
     "ts-node": "^10.9.1",
     "tsconfig-to-dual-package": "^1.1.1",

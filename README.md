@@ -39,13 +39,15 @@ In the browser:
 
 ```js
 const { TextJs } = await import(
-  "https://unpkg.com/text-js-render@1.0.0-beta.0/lib/index.js?module"
+  "https://unpkg.com/text-js-render@1.0.0-rc.0/module/index.js?module"
 );
 
 const template = "<h1>{{text}}</h1>";
 const context = { text: "My text" };
 const result = new TextJs(template).render(context);
 ```
+
+**Remark**: for browser, a minified version is also available at [https://unpkg.com/text-js-render@1.0.0-rc.0/module/index.min.js?module](https://unpkg.com/text-js-render@1.0.0-rc.0/module/index.min.js?module)
 
 ### Basic example
 
@@ -90,7 +92,63 @@ const template = `
 // Render your context with the template
 // The result is trimmed since we are making HTML
 const result = new TextJs(template, { trimResult: true }).render(context);
-// Will returns "<h3>Text Js is amazing !</h3><p>Why rendering templates using Function is amazing and more.</p><p>Nathan Prijot(nathanprijot@ipnosite.be)<span>04/01/2023</span></p>"
+// Will return "<h3>Text Js is amazing !</h3><p>Why rendering templates using Function is amazing and more.</p><p>Nathan Prijot(nathanprijot@ipnosite.be)<span>04/01/2023</span></p>"
+```
+
+### Inline JavaScript
+
+Inline JavaScript gives you access to the context you passed when rendering. Multiple variations are supported:
+
+#### Single line output
+
+All the properties in your context are directly available in inline JavaScript. If no `return` or `;` are present in the code, the result of the JavaScript will be directly dumped into the result. You also have direct access to the context itself.
+
+```ts
+const context = { text: "Hello !" };
+
+const template = `{{ text }}{{ context.text }}{{ return context.text; }}`;
+
+const result = new TextJs(template).render(context);
+// Will return "Hello !Hello !Hello !"
+```
+
+#### Multiple line output
+
+Inline JavaScript can also uses multiple lines. In that case you need to return the value that will be dumped yourself.
+
+```ts
+const context = { text: "Hello !" };
+
+const template = `
+{{ 
+  const myText = text + "!!"; 
+  return myText;
+}}
+    `;
+
+const result = new TextJs(template, { trimResult: true }).render(context);
+// Will return "Hello !!!"
+```
+
+#### Inline computation
+
+With a `;` and no `return`. Inline JavaScript does not dump any value. But you can uses these code snippets to change or add properties to the context. However, as this example shows, be aware that the context is scoped for each block and that direct property access have limitations.
+
+```ts
+const template = `
+{{ context.value = 1; }}
+{% foreach item in [0, 1, 2, 3] %}
+  {{ context.value += 1; }}
+{% endforeach %}
+{{ value += 1; }}
+{{ context.value += 1; }}
+{{ value }}
+    `;
+
+const result = new TextJs(template, { trimResult: true }).render();
+// Will return "2"
+// The context in the foreach is scoped to the foreach itself.
+// The ability to directly access the context property is a syntax sugar but of course affecting that property will not affect the actual context value.
 ```
 
 ### Available statements
@@ -115,7 +173,7 @@ new TextJs(`
       Else
     {% endif %}
   `).render({ foobar: "foo" }, { trimResult: true });
-// Will returns "Foo"
+// Will return "Foo"
 ```
 
 #### foreach, endforeach
@@ -128,7 +186,7 @@ new TextJs(`
       {{index + 1}}. {{ item }}
     {% endforeach %}
   `).render({ array: ["foo", "bar"] }, { trimResult: true });
-// Will returns "1. foo2. bar"
+// Will return "1. foo2. bar"
 ```
 
 #### switch, case, default, endswitch
@@ -148,7 +206,7 @@ new TextJs(`
         Default
     {% endswitch %}
   `).render({ foobar: "foo" }, { trimResult: true });
-// Will returns "Foo"
+// Will return "Foo"
 ```
 
 Dynamic cases values example:
@@ -165,14 +223,14 @@ new TextJs(`
   { foobar: "bar", fooCase: "foo", barCase: "bar" },
   { trimResult: true }
 );
-// Will returns "Bar"
+// Will return "Bar"
 ```
 
 ### Option
 
 #### Trim result
 
-By default, Text Js will not remove any of the white-spaces from the template. The `trimResult` option wil remove all the lines returns and all the white-spaces at the start and end of each line:
+By default, Text Js will not remove any of the white-spaces from the template. The `trimResult` option will remove all the lines returns and all the white-spaces at the start and end of each line:
 
 ```ts
 new TextJs(
@@ -183,14 +241,14 @@ new TextJs(
 ).render({
   text: "Hello",
 });
-// Will returns "Hello   hello"
+// Will return "Hello   hello"
 ```
 
 If you still need lines returns or white-spaces, you can insert them with a JavaScript snippet:
 
 ```ts
 new TextJs(`Text{{"\\n"}}Text`).render();
-// Will returns "Text\nText" (where "\n" is an actual line return in the string)
+// Will return "Text\nText" (where "\n" is an actual line return in the string)
 ```
 
 #### Custom delimiters
@@ -213,7 +271,7 @@ const customDelimitersTemplate =
 new TextJs(customDelimitersTemplate, customDelimitersOptions).render({
   array: ["He", "ll", "o !"],
 });
-// Will returns "Hello !"
+// Will return "Hello !"
 ```
 
 #### Custom keywords
@@ -245,7 +303,7 @@ new TextJs(customStatementsTemplate, customStatementsOptions).render({
   array: ["Hel", "lo !"],
   hello: 1,
 });
-// Will returns "Hi !Hello !Hello !"
+// Will return "Hi !Hello !Hello !"
 ```
 
 ## License

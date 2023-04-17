@@ -540,4 +540,55 @@ describe("examples", () => {
       ).render({ foobar: "bar", fooCase: "foo", barCase: "bar" })
     ).toBe("Bar");
   });
+
+  it("single line output", () => {
+    const context = { text: "Hello !" };
+
+    const template = `{{ text }}{{ context.text }}{{ return context.text; }}`;
+
+    const result = new TextJs(template).render(context);
+
+    expect(result).toBe("Hello !Hello !Hello !");
+  });
+
+  it("multiple lines output", () => {
+    const context = { text: "Hello !" };
+
+    const template = `
+{{ 
+  const myText = text + "!!"; 
+  return myText;
+}}
+    `;
+
+    const result = new TextJs(template, { trimResult: true }).render(context);
+
+    expect(result).toBe("Hello !!!");
+  });
+
+  it("inline computation", () => {
+    const template = `
+{{ context.value = 1; }}
+{% foreach item in [0, 1, 2, 3] %}
+  {{ value += 1; }}
+{% endforeach %}
+{{ value += 1; }}
+{{ context.value += 1; }}
+{{ value }}
+    `;
+
+    const result = new TextJs(template, { trimResult: true }).render();
+
+    expect(result).toBe("2");
+  });
+});
+
+describe("specs", () => {
+  it("statements support any amount of spaces", () => {
+    expect(
+      new TextJs(
+        "{%       if            true           %}Hello !{%           endif                               %}"
+      ).render()
+    ).toBe("Hello !");
+  });
 });
